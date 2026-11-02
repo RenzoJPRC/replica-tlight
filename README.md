@@ -106,3 +106,29 @@ Expand-Archive -Path .\repos\TLIGHT-SYSTEM\Dataset\test_data.zip -DestinationPat
 ### 3. Ejecutar el flujo de la réplica
 
 Con el entorno virtual activado, ejecutar en orden los scripts indicados en la sección **Orden de ejecución**.
+## Analisis adicional: variantes OCNN e histogramas
+
+### Comparacion de variantes OCNN
+
+Se conservaron dos implementaciones para hacer explicita una diferencia del codigo fuente disponible:
+
+- `src/08_entrenar_ocnn.py` usa la activacion ReLU.
+- `src/08_entrenar_ocnn_codigo_original.py` conserva el comportamiento literal del codigo publicado: aunque la funcion auxiliar se llama `relu`, devuelve la entrada sin aplicar ReLU.
+
+La segunda variante fue adaptada para TensorFlow 2. Ambas se comparan con los valores publicados mediante `src/14_comparar_variantes_ocnn.py`. Los resultados muestran diferencias entre conjuntos; ninguna variante reproduce exactamente todos los valores del articulo.
+
+Para repetir esta comparacion, primero ejecutar los entrenamientos de ambas variantes y luego:
+
+```powershell
+python .\src\14_comparar_variantes_ocnn.py
+```
+
+### Histogramas de puntajes de decision
+
+El script `src/15_generar_histogramas.py` crea 20 imagenes en `results/plots`: una por cada combinacion de modelo y conjunto de prueba. Requiere las predicciones guardadas de Isolation Forest, OCSVM y ambas variantes OCNN.
+
+```powershell
+python .\src\15_generar_histogramas.py
+```
+
+La visualizacion esta adaptada del repositorio Decision-Score-Histogram. Su licencia MIT se conserva en `src/LICENSE_Decision-Score-Histogram.txt`. La guia `results/plots/README.md` explica la convencion de clases y la interpretacion de los ejes.
