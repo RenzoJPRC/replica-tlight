@@ -76,6 +76,11 @@ El artículo menciona ANOVA y Tukey sobre 20 muestras, pero no especifica comple
 
 ## Reproducir desde cero en Windows
 
+```powershell
+git clone https://github.com/RenzoJPRC/replica-tlight.git
+Set-Location .\replica-tlight
+```
+
 Ejecutar estos pasos desde la carpeta raíz del proyecto en PowerShell:
 
 ### 1. Crear el entorno e instalar dependencias
