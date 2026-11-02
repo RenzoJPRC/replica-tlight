@@ -73,3 +73,31 @@ El artículo menciona ANOVA y Tukey sobre 20 muestras, pero no especifica comple
 - OCNN se adaptó a TensorFlow 2 para poder ejecutarse en el entorno actual.
 - Se fijó una semilla para Isolation Forest porque el artículo no especifica la utilizada.
 - Los valores F1 publicados están redondeados, y algunas diferencias entre modelos y conjuntos son amplias.
+
+## Reproducir desde cero en Windows
+
+Ejecutar estos pasos desde la carpeta raíz del proyecto en PowerShell:
+
+### 1. Crear el entorno e instalar dependencias
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r .\requirements.txt
+```
+
+### 2. Descargar y preparar los datos
+
+Los archivos de datos se obtienen del repositorio público TLIGHT-SYSTEM. Estos comandos descargan el repositorio y extraen los CSV a `data/`:
+
+```powershell
+New-Item -ItemType Directory -Force .\repos, .\data | Out-Null
+git clone https://github.com/emmanuelaboah/TLIGHT-SYSTEM.git .\repos\TLIGHT-SYSTEM
+Expand-Archive -Path .\repos\TLIGHT-SYSTEM\Dataset\train_data.zip -DestinationPath .\data -Force
+Expand-Archive -Path .\repos\TLIGHT-SYSTEM\Dataset\test_data.zip -DestinationPath .\data -Force
+```
+
+### 3. Ejecutar el flujo de la réplica
+
+Con el entorno virtual activado, ejecutar en orden los scripts indicados en la sección **Orden de ejecución**.
