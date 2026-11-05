@@ -11,40 +11,63 @@ bootstrap = pd.read_csv(
     RESULTS / "bootstrap_f1_resumen.csv"
 )
 
-# Unificamos el nombre de OCNN para poder combinar las tablas.
-comparacion["modelo"] = comparacion["modelo"].replace({
-    "OCNN (ReLU)": "OCNN"
-})
+# Asignamos los valores publicados de OCNN a ambas variantes de OCNN.
+mapa_modelo_articulo = {
+    "Isolation Forest": "Isolation Forest",
+    "OCNN ReLU": "OCNN (ReLU)",
+    "OCNN código original": "OCNN (ReLU)",
+    "OCSVM": "OCSVM",
+}
 
-columnas_bootstrap = [
-    "conjunto",
-    "modelo",
-    "ic95_inferior",
-    "ic95_superior",
-]
-bootstrap = bootstrap[columnas_bootstrap]
+bootstrap["modelo_articulo"] = bootstrap["modelo"].map(mapa_modelo_articulo)
 
-tabla_final = comparacion.merge(
-    bootstrap,
-    on=["conjunto", "modelo"],
-    how="left",
-    validate="one_to_one",
+if bootstrap["modelo_articulo"].isna().any():
+    modelos_desconocidos = bootstrap.loc[
+        bootstrap["modelo_articulo"].isna(), "modelo"
+    ].unique()
+    raise ValueError(
+        f"Modelos sin correspondencia en el artículo: {modelos_desconocidos}"
+    )
+
+publicados = comparacion[["modelo", "conjunto", "f1_articulo"]].rename(
+    columns={
+        "modelo": "modelo_articulo",
+        "f1_articulo": "f1_publicado",
+    }
 )
 
+tabla_final = bootstrap.merge(
+    publicados,
+    on=["modelo_articulo", "conjunto"],
+    how="left",
+    validate="many_to_one",
+)
+
+if tabla_final["f1_publicado"].isna().any():
+    faltantes_pub = tabla_final[
+        tabla_final["f1_publicado"].isna()
+    ][["modelo", "conjunto"]]
+    raise ValueError(
+        "Faltan valores publicados para estas filas:\n"
+        + faltantes_pub.to_string(index=False)
+    )
+
 if tabla_final["ic95_inferior"].isna().any():
-    faltantes = tabla_final[
+    faltantes_ic = tabla_final[
         tabla_final["ic95_inferior"].isna()
     ][["modelo", "conjunto"]]
     raise ValueError(
         "Faltan intervalos bootstrap para estas filas:\n"
-        + faltantes.to_string(index=False)
+        + faltantes_ic.to_string(index=False)
     )
 
 tabla_final = tabla_final.rename(columns={
-    "f1_articulo": "f1_publicado",
-    "f1_replicado": "f1_replicado_ponderado",
-    "diferencia": "diferencia_replicado_menos_articulo",
+    "f1_observado_ponderado": "f1_replicado_ponderado",
 })
+
+tabla_final["diferencia_replicado_menos_articulo"] = (
+    tabla_final["f1_replicado_ponderado"] - tabla_final["f1_publicado"]
+)
 
 tabla_final = tabla_final[[
     "modelo",
@@ -65,7 +88,7 @@ tabla_final.to_csv(
 # Resumen de los cinco conjuntos por modelo.
 resumen = (
     tabla_final
-    .groupby("modelo", as_index=False)
+    .groupby("modelo", as_index=False, sort=False)
     .agg(
         f1_publicado_promedio=("f1_publicado", "mean"),
         f1_replicado_promedio=("f1_replicado_ponderado", "mean"),
@@ -82,6 +105,10 @@ resumen.to_csv(
     index=False,
     encoding="utf-8-sig",
 )
+
+print(f"\nFilas en comparacion_final.csv: {len(tabla_final)}")
+print(f"Modelos en resumen_final_por_modelo.csv: {len(resumen)}")
+print(f"Valores publicados vacíos: {int(tabla_final['f1_publicado'].isna().sum())}")
 
 print("\nComparación final por conjunto:")
 print(tabla_final.round(4).to_string(index=False))

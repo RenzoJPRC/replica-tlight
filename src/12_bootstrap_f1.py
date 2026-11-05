@@ -8,7 +8,8 @@ RESULTS = ROOT / "results"
 
 MODELOS = {
     "Isolation Forest": "if",
-    "OCNN": "ocnn",
+    "OCNN ReLU": "ocnn",
+    "OCNN código original": "ocnn_codigo_original",
     "OCSVM": "ocsvm",
 }
 CONJUNTOS = [f"test_set_{i}" for i in range(1, 6)]
@@ -99,9 +100,12 @@ for conjunto in CONJUNTOS:
 
     # Diferencias pareadas: F1 del primer modelo menos el segundo.
     pares = [
-        ("Isolation Forest", "OCNN"),
+        ("Isolation Forest", "OCNN ReLU"),
+        ("Isolation Forest", "OCNN código original"),
         ("Isolation Forest", "OCSVM"),
-        ("OCNN", "OCSVM"),
+        ("OCNN ReLU", "OCNN código original"),
+        ("OCNN ReLU", "OCSVM"),
+        ("OCNN código original", "OCSVM"),
     ]
 
     for modelo_a, modelo_b in pares:
