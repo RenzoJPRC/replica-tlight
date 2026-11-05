@@ -36,6 +36,7 @@ python .\src\05_entrenar_if.py
 python .\src\06_entrenar_ocsvm.py
 python .\src\07_diagnostico_ocsvm.py
 python .\src\08_entrenar_ocnn.py
+python .\src\08_entrenar_ocnn_codigo_original.py
 python .\src\09_diagnosticar_ocnn.py
 python .\src\10_comparar_modelos.py
 python .\src\11_comparar_con_articulo.py
@@ -43,7 +44,7 @@ python .\src\12_bootstrap_f1.py
 python .\src\13_consolidar_resultados.py
 ```
 
-Los scripts 05, 06 y 08 entrenan los modelos. Los scripts posteriores analizan sus predicciones y resultados. Para generar nuevamente las tablas de comparación, deben existir las predicciones guardadas en `results/`.
+Los scripts `05_entrenar_if.py`, `06_entrenar_ocsvm.py`, `08_entrenar_ocnn.py` y `08_entrenar_ocnn_codigo_original.py` entrenan los modelos (incluyendo las dos variantes de OCNN). Los scripts posteriores analizan sus predicciones y resultados. Para ejecutar `12_bootstrap_f1.py`, primero deben estar guardadas en `results/` las predicciones de los cuatro modelos. Después se ejecuta `13_consolidar_resultados.py`, que consolida los resultados del bootstrap con los valores publicados en el artículo.
 
 ## Convenciones de los datos
 
@@ -64,7 +65,7 @@ Los resultados consolidados se guardan en:
 
 ## Alcance estadístico
 
-El bootstrap pareado remuestrea las filas de cada conjunto manteniendo las mismas filas para los tres modelos. Sus intervalos describen variabilidad asociada a esos conjuntos y predicciones. No representan nuevos entrenamientos ni datos de otros sistemas.
+El bootstrap pareado compara cuatro modelos (`Isolation Forest`, `OCNN ReLU`, `OCNN código original` y `OCSVM`) mediante 2,000 remuestras pareadas de las filas de cada conjunto, manteniendo las mismas filas remuestreadas para todos los modelos. Sus intervalos del 95% describen la variabilidad asociada a esos conjuntos y predicciones, y sus comparaciones pareadas no tienen ajuste por comparaciones múltiples. No representan nuevos entrenamientos ni datos de otros sistemas.
 
 El artículo menciona ANOVA y Tukey sobre 20 muestras, pero no especifica completamente cómo se generaron. Por ello, el análisis bootstrap de esta réplica es complementario y no debe presentarse como reproducción exacta de esas pruebas.
 
